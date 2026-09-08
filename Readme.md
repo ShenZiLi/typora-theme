@@ -63,4 +63,4 @@ Sun 与 Moon 的排版由 `moon.css` 单一维护、自动派生 `sun.css`（仅
 
 ## 📜 License
 
-> 待定。建议选择一个开源许可证（如 MIT）并添加 `LICENSE` 文件后，同步更新上方 License 徽章。
+[MIT](LICENSE) © [ShenZiLi](https://github.com/ShenZiLi)
