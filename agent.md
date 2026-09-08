@@ -75,7 +75,11 @@ while True:
 sun = ''.join(out)
 sun = sun.replace("@import './Moon/codeblock.xydark.css';",
                   "@import './Sun/codeblock.xylight.css';")
-header = "/* Sun (Light) · Typora Theme — 派生自 moon.css，请勿手改排版 */\n"
+header = ("/* ============================================================\n"
+          "   Sun (Light) · Typora Theme\n"
+          "   与 Moon 主题排版/字体/间距完全一致，仅配色为亮色。\n"
+          "   派生自 Moon.css，两文件请同步维护。\n"
+          "   ============================================================ */\n")
 open('sun.css', 'w', encoding='utf-8').write(header + sun)
 print('sun.css regenerated')
 PYEOF

@@ -766,3 +766,8 @@ code {
 .md-diagram-panel svg .taskTextOutsideLeft {
   fill: #1d1d1f !important;
 }
+
+/* 正文图片圆角 */
+#write img {
+  border-radius: 8px;
+}
