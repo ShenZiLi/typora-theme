@@ -1,9 +1,10 @@
 /* ============================================================
-   Claude (Light) · Typora Theme — Claude 亮色（awesome-design-md/claude）
-   与 Moon 主题排版/字体/间距完全一致，仅配色为亮色。
-   派生自 Moon.css，两文件请同步维护。
+   Claude (Light) · Typora Theme — Claude 设计语言（awesome-design-md/claude）
+   基底派生自 Moon.css（排版与 Moon/Sun 同源，勿手改基底排版）；
+   尾部为 Claude/character.css 特色层（衬线标题/深色代码卡/奶油 mermaid）。
+   重建方式见 agent.md SOP-C；特色只改 Claude/character.css。
    ============================================================ */
-@import './Claude/codeblock.xylight.css';
+@import './Claude/codeblock.xydark.css';
 
 @font-face {
   font-family: 'HONOR Sans Design Regular';
@@ -775,4 +776,300 @@ code {
 /* 正文图片圆角 */
 #write img {
   border-radius: 8px;
+}
+
+/* ==========================================================================
+   Claude Character.css — Claude 主题特色层（唯一手改文件）
+   tokens 依据 awesome-design-md/claude/DESIGN.md
+   特色：① 衬线标题（display 400，勿加粗）
+         ② 珊瑚链接（hairline 下划线）
+         ③ 珊瑚左线引用
+         ④ 深色代码卡 #181715（cream ↔ dark 节奏核心）
+         ⑤ Claude 奶油 mermaid（取代基底 Apple 蓝卡）
+         ⑥ 表格 / 分隔线 / 图片 Claude 化
+   本文件内容由 SOP-C 拼接到 claude.css 末尾（后置覆盖基底）。
+   改本文件后执行 agent.md 的 SOP-C 重建 claude.css。
+   ========================================================================== */
+
+/* ---------- ① 衬线标题：Copernicus 系 slab-serif @400，负字距 ---------- */
+#write h1,
+#write h2,
+#write h3,
+#write h4,
+#write h5,
+#write h6 {
+  font-family: "Cormorant Garamond", "Songti SC", "STSong", "Noto Serif SC",
+               "Source Han Serif SC", Georgia, "Times New Roman", serif !important;
+  font-weight: 400 !important;        /* Claude：display 永不 bold */
+  color: #141413 !important;          /* ink */
+}
+#write h1 {
+  font-size: 2.05em !important;
+  line-height: 1.25 !important;
+  letter-spacing: -0.02em;
+}
+#write h2 {
+  font-size: 1.7em !important;
+  line-height: 1.3 !important;
+  letter-spacing: -0.015em;
+}
+#write h3 {
+  font-size: 1.4em !important;
+  line-height: 1.35 !important;
+  letter-spacing: -0.01em;
+}
+#write h4 {
+  font-size: 1.2em !important;
+  line-height: 1.4 !important;
+}
+#write h5 {
+  font-size: 1.05em !important;
+  color: #3d3d3a !important;          /* body-strong */
+}
+#write h6 {
+  font-size: 1em !important;
+  color: #6c6a64 !important;          /* muted */
+}
+
+/* ---------- ② 链接：珊瑚 inline link + hairline 下划线，hover 深珊瑚 ---------- */
+#write a {
+  color: #cc785c !important;                        /* primary */
+  text-decoration: underline;
+  text-decoration-color: #e6dfd8 !important;        /* hairline */
+  text-underline-offset: 3px;
+}
+#write a:hover {
+  color: #a9583e !important;                        /* primary-active */
+  text-decoration-color: #a9583e !important;
+}
+
+/* ---------- ③ 引用：珊瑚左线 editorial 卡 ---------- */
+#write blockquote {
+  border-left: 3px solid #cc785c !important;
+  background-color: #f5f0e8 !important;             /* surface-soft */
+  border-radius: 8px !important;                    /* rounded.md */
+  color: #3d3d3a !important;                        /* body */
+}
+
+/* ---------- ④ 深色代码卡：cream ↔ dark 节奏（surface-dark #181715） ---------- */
+#write .md-fences {
+  background-color: #181715 !important;             /* surface-dark */
+  border: 1px solid #252320 !important;             /* surface-dark-elevated */
+  border-radius: 12px !important;                   /* rounded.lg */
+  color: #faf9f5 !important;                        /* on-dark */
+}
+#write .md-fences .CodeMirror,
+#write .md-fences .CodeMirror-scroll {
+  background-color: #181715 !important;
+  color: #faf9f5 !important;
+}
+#write .md-fences .CodeMirror-gutters {
+  background-color: #1f1e1b !important;             /* surface-dark-soft */
+  border-right: none !important;
+}
+#write .md-fences .CodeMirror-linenumber {
+  color: #a09d96 !important;                        /* on-dark-soft */
+}
+#write .md-fences .CodeMirror-cursor {
+  border-left: 1px solid #faf9f5 !important;
+}
+/* 选中代码文字保持暖 cream（Claude/codeblock.xydark.css 已处理语法色） */
+#write .md-fences .CodeMirror-selected,
+#write .md-fences .CodeMirror-selectedtext {
+  background: #4a89dc !important;
+  color: #faf9f5 !important;
+}
+
+/* ---------- ⑤ 行内代码：cream 卡底 + 深珊瑚字 ---------- */
+#write code,
+#write tt {
+  background-color: #efe9de !important;             /* surface-card */
+  border: 1px solid #ebe6df !important;             /* hairline-soft */
+  border-radius: 6px !important;                    /* rounded.sm */
+  color: #a9583e !important;                        /* primary-active */
+}
+
+/* ---------- ⑥ 表格：cream-strong 表头 + hairline 细分隔 ---------- */
+#write table thead {
+  background-color: #e8e0d2 !important;             /* surface-cream-strong */
+}
+#write table tr:nth-child(2n) {
+  background-color: #f5f0e8 !important;             /* surface-soft */
+}
+#write table tr th {
+  border: 1px solid #e6dfd8 !important;             /* hairline */
+  color: #141413 !important;
+  font-weight: 600 !important;
+}
+#write table tr td {
+  border: 1px solid #e6dfd8 !important;
+}
+#write table tr {
+  border-top: 1px solid #e6dfd8 !important;
+}
+
+/* ---------- ⑦ 分隔线 / 图片：hairline + 12px 圆角 ---------- */
+#write hr {
+  border-top: 1px solid #e6dfd8 !important;         /* hairline */
+}
+#write img {
+  border-radius: 12px !important;                   /* rounded.lg */
+}
+
+/* ---------- ⑧ mermaid：Claude 奶油卡（覆盖基底 Apple 蓝卡） ---------- */
+/* 画布：cream canvas + hairline + rounded.lg；字体随正文 HONOR Sans */
+.md-diagram-panel,
+.md-fences-adv-panel {
+  background-color: #faf9f5 !important;             /* canvas */
+  border: 1px solid #e6dfd8 !important;             /* hairline */
+  border-radius: 12px !important;                   /* rounded.lg */
+  font-family: "HONOR Sans Design Regular", -apple-system, BlinkMacSystemFont,
+               "Segoe UI", Roboto, sans-serif !important;
+}
+/* 连接线：muted-soft 暖灰 */
+.md-diagram-panel svg .flowchart-link,
+.md-diagram-panel svg .edgePaths path,
+.md-diagram-panel svg .messageLine0,
+.md-diagram-panel svg .messageLine1,
+.md-diagram-panel svg .relation,
+.md-diagram-panel svg .transition,
+.md-diagram-panel svg .trigger-arrow,
+.md-diagram-panel svg line,
+.md-diagram-panel svg path {
+  stroke: #8e8b82 !important;
+  stroke-width: 1.6px !important;
+  fill: none !important;
+}
+.md-diagram-panel svg .divider {
+  stroke-width: 1px !important;
+}
+/* 箭头：coral —— 全图唯一强调 */
+.md-diagram-panel svg marker path,
+.md-diagram-panel svg marker polygon,
+.md-diagram-panel svg .arrowhead path,
+.md-diagram-panel svg .arrowhead polygon {
+  fill: #cc785c !important;
+  stroke: #cc785c !important;
+}
+/* 节点：surface-card cream 卡 + hairline */
+.md-diagram-panel svg .node rect,
+.md-diagram-panel svg .node circle,
+.md-diagram-panel svg .node ellipse,
+.md-diagram-panel svg .node polygon,
+.md-diagram-panel svg .node path,
+.md-diagram-panel svg .label-container {
+  fill: #efe9de !important;
+  stroke: #e6dfd8 !important;
+  stroke-width: 1px !important;
+}
+.md-diagram-panel svg .node rect {
+  rx: 8px !important;
+  ry: 8px !important;
+}
+/* 文字：ink；边标签 muted */
+.md-diagram-panel svg .nodeLabel,
+.md-diagram-panel svg .nodeLabel > div,
+.md-diagram-panel svg .label {
+  fill: #141413 !important;
+  color: #141413 !important;
+}
+.md-diagram-panel svg .edgeLabel,
+.md-diagram-panel svg .edgeLabel > div {
+  fill: #6c6a64 !important;
+  color: #6c6a64 !important;
+}
+.md-diagram-panel svg .edgeLabel rect,
+.md-diagram-panel svg .edgeLabel .label-container {
+  fill: #f5f0e8 !important;
+  stroke: none !important;
+}
+/* 子图 / 分组 */
+.md-diagram-panel svg .cluster rect,
+.md-diagram-panel svg .cluster polygon,
+.md-diagram-panel svg .cluster circle,
+.md-diagram-panel svg .cluster path {
+  fill: rgba(204, 120, 92, 0.04) !important;
+  stroke: #e6dfd8 !important;
+  stroke-width: 1px !important;
+}
+.md-diagram-panel svg .cluster text,
+.md-diagram-panel svg .cluster span {
+  fill: #6c6a64 !important;
+  color: #6c6a64 !important;
+}
+/* 时序图 */
+.md-diagram-panel svg .actor,
+.md-diagram-panel svg .actor-box {
+  fill: #efe9de !important;
+  stroke: #e6dfd8 !important;
+}
+.md-diagram-panel svg .actor-line,
+.md-diagram-panel svg .actor-man line {
+  stroke: rgba(20, 20, 19, 0.18) !important;
+}
+.md-diagram-panel svg .activation rect,
+.md-diagram-panel svg .activation {
+  fill: rgba(204, 120, 92, 0.18) !important;
+  stroke: none !important;
+}
+/* 序号：圆底 cream-strong + 数字深珊瑚（marker#sequencenumber + text.sequenceNumber） */
+.md-diagram-panel svg #sequencenumber,
+.md-diagram-panel svg #sequencenumber circle {
+  fill: #e8e0d2 !important;
+  stroke: none !important;
+}
+.md-diagram-panel svg .sequenceNumber {
+  fill: #a9583e !important;
+  font-weight: 600 !important;
+}
+.md-diagram-panel svg .note,
+.md-diagram-panel svg .note rect,
+.md-diagram-panel svg .note polygon {
+  fill: rgba(204, 120, 92, 0.06) !important;
+  stroke: rgba(204, 120, 92, 0.35) !important;
+}
+.md-diagram-panel svg .loopLine,
+.md-diagram-panel svg .loopText {
+  stroke: #e6dfd8 !important;
+  fill: #6c6a64 !important;
+}
+/* 类图 / ER 图：cream 行间交替 */
+.md-diagram-panel svg .classGroup rect,
+.md-diagram-panel svg .entityBox {
+  fill: #efe9de !important;
+  stroke: #e6dfd8 !important;
+}
+.md-diagram-panel svg .classGroup line,
+.md-diagram-panel svg .relationshipLine {
+  stroke: #ebe6df !important;
+}
+.md-diagram-panel svg .attributeBoxEven {
+  fill: #f5f0e8 !important;
+  stroke: #ebe6df !important;
+}
+.md-diagram-panel svg .attributeBoxOdd,
+.md-diagram-panel svg .relationshipLabelBox {
+  fill: #efe9de !important;
+  stroke: #ebe6df !important;
+}
+/* 状态图 */
+.md-diagram-panel svg .statediagram-state .node rect,
+.md-diagram-panel svg .statediagram-state .node circle {
+  fill: #efe9de !important;
+  stroke: #e6dfd8 !important;
+}
+.md-diagram-panel svg .statediagram-cluster .outer,
+.md-diagram-panel svg .statediagram-cluster .inner {
+  fill: rgba(204, 120, 92, 0.03) !important;
+  stroke: #e6dfd8 !important;
+}
+/* 甘特：网格/文字适配奶油底（任务条保留默认配色） */
+.md-diagram-panel svg .grid .tick line,
+.md-diagram-panel svg .grid path {
+  stroke: #ebe6df !important;
+}
+.md-diagram-panel svg .taskText,
+.md-diagram-panel svg .taskTextOutsideRight,
+.md-diagram-panel svg .taskTextOutsideLeft {
+  fill: #141413 !important;
 }
