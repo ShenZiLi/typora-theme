@@ -4,12 +4,12 @@
   <img src="https://img.shields.io/badge/Typora-0.11%2B-1d1d1f?style=flat-square" alt="Typora">
 </p>
 
-<h1 align="center">🌙☀️ Typora Theme · Sun & Moon</h1>
+<h1 align="center">🌙☀️ Typora Theme · Moon / Sun / Claude</h1>
 
 <p align="center">
-  <b>一套排版，两种心境。</b><br>
-  Sun（亮）与 Moon（暗）是一组<em>镜像主题</em>——字体、间距、图表样式完全一致，仅配色不同。<br>
-  白天用 Sun，夜里用 Moon，行文体验始终如一。
+  <b>一套排版，三种心境。</b><br>
+  Moon（暗）· Sun（亮 · 白底金）· Claude（亮 · 奶油珊瑚）是<em>同排版镜像主题</em>——字体、间距、图表样式完全一致，仅配色不同。<br>
+  白天用 Sun，夜里用 Moon，想要 Claude 的奶油质感就切 Claude，行文体验始终如一。
 </p>
 
 ---
@@ -36,8 +36,9 @@
 
 | 主题 | 模式 | 文件 | 说明 |
 | --- | --- | --- | --- |
-| **Sun** | ☀️ 亮色 | `sun.css` + `Sun/` | 奶油米色画布，珊瑚强调（Claude 风格 `#cc785c`） |
 | **Moon** | 🌙 暗色 | `moon.css` + `Moon/` | 深底浅字，金色强调（`#fcba03`） |
+| **Sun** | ☀️ 亮色 | `sun.css` + `Sun/` | 白底墨字，金色强调（`#b58900`） |
+| **Claude** | 🎨 亮色 | `claude.css` + `Claude/` | 奶油米色画布，珊瑚强调（Claude 风格 `#cc785c`） |
 
 ## 🚀 安装
 
@@ -54,7 +55,7 @@ Sun 与 Moon 的排版由 `moon.css` 单一维护、自动派生 `sun.css`（仅
 
 ## 📄 更新日志
 
-- **2026-09-08**：Sun/Moon 双子主题发布 —— 由 Typora 默认主题（Github / Notes Dark）改造：统一字体、排版镜像同步、内建 Apple 风格亮色 Mermaid、GitHub 语义代码高亮
+- **2026-09-08**：Moon / Sun / Claude 三主题发布 —— 由 Typora 默认主题（Notes Dark / Github）改造：统一字体、排版镜像同步、内建 Apple 风格亮色 Mermaid、GitHub 语义代码高亮。Sun 白底金、Claude 奶油珊瑚（Claude 设计语言）
 
 ## 🤝 致谢
 
