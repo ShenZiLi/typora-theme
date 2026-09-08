@@ -1,17 +1,17 @@
-@import './notes-dark/codeblock.xydark.css';
+@import './Moon/codeblock.xydark.css';
 
 @font-face {
   font-family: 'HONOR Sans Design Regular';
   font-style: normal;
   font-weight: normal;
-  /*src: local("Fira Mono Regular"), url("./notes-dark/FiraMono-Regular.ttf") format("truetype");*/
+  /*src: local("Fira Mono Regular"), url("./Moon/FiraMono-Regular.ttf") format("truetype");*/
 }
 
 @font-face {
   font-family: 'HONOR Sans Design Regular';
   font-style: normal;
   font-weight: bold;
-  /*src: local("Fira Mono Bold"), url("./notes-dark/FiraMono-Bold.ttf") format("truetype");*/
+  /*src: local("Fira Mono Bold"), url("./Moon/FiraMono-Bold.ttf") format("truetype");*/
 }
 
 :root {
