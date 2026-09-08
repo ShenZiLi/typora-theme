@@ -153,6 +153,12 @@ real = [(i, x, y) for i, (x, y) in enumerate(zip(m, s))
         and x != y]
 print('real diffs:', len(real)); [print(i, x, '||', y) for i, x, y in real[:10]]
 assert not real
+# 必查：palette 必须生效（结构 diff 会跳过 :root 值，此处兜底防派生失效）
+root = open('sun.css').read()
+i = root.find(':root {')
+assert i != -1 and '--bg-color: #ffffff' in root[i:root.find('}', i)+1] \
+   and '--text-color: #1d1d1f' in root[i:root.find('}', i)+1], 'palette NOT applied!'
+print('palette OK (sun :root is light)')
 "
 # 2) codeblock 镜像结构 diff
 diff <(sed 's/#[0-9A-Fa-f]\{3,8\}/#X/g' Moon/codeblock.xydark.css) \
