@@ -64,8 +64,10 @@ while True:
         out.append(moon[i:]); break
     d = 0; j = st
     while j < len(moon):
-        d += moon[j] == '{'; d -= moon[j] == '}'
-        if d == 0: break
+        if moon[j] == '{': d += 1
+        elif moon[j] == '}':
+            d -= 1
+            if d == 0: break
         j += 1
     block = moon[st:j+1]
     for k, v in palette.items():
