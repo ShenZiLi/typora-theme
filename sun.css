@@ -1,5 +1,5 @@
 /* ============================================================
-   Sun (Light) · Typora Theme
+   Sun (Light) · Typora Theme — Claude 亮色（参考 awesome-design-md/claude）
    与 Moon 主题排版/字体/间距完全一致，仅配色为亮色。
    派生自 Moon.css，两文件请同步维护。
    ============================================================ */
@@ -20,26 +20,26 @@
 }
 
 :root {
-  --primary-color: #b58900;
-  --primary-color-rgb: 181, 137, 0;
+  --primary-color: #cc785c;
+  --primary-color-rgb: 204, 120, 92;
 
-  --bg-color: #ffffff;
-  --bg-color-dark: #f5f6f7;
-  --dark-trait: #d0d7de;
-  --light-trait-100: #f0f2f4;
-  --light-trait-200: #e2e5e8;
-  --light-trait-300: #8b949e;
-  --light-trait-400: #6e7781;
+  --bg-color: #faf9f5;
+  --bg-color-dark: #efe9de;
+  --dark-trait: #e6dfd8;
+  --light-trait-100: #f5f0e8;
+  --light-trait-200: #ebe6df;
+  --light-trait-300: #8e8b82;
+  --light-trait-400: #6c6a64;
 
-  --text-color: #1d1d1f;
-  --text-color-secondary: #6e6e73;
-  --text-highlight-color: #1d1d1f;
+  --text-color: #141413;
+  --text-color-secondary: #6c6a64;
+  --text-highlight-color: #141413;
   --text-highlight-bg: rgba(var(--primary-color-rgb), 0.3);
-  --select-text-bg-color: rgba(0, 122, 255, 0.22);
+  --select-text-bg-color: rgba(204, 120, 92, 0.22);
   --search-select-text-color: var(--text-highlight-color);
   --search-select-bg-color: var(--text-highlight-bg);
 
-  --code-color: #a626a4;
+  --code-color: #a9583e;
 
   --border-radius: 3px;
 

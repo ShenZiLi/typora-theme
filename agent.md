@@ -39,22 +39,23 @@ cd "~/Library/Application Support/abnerworks.Typora/themes" && python3 << 'PYEOF
 import re
 moon = open('moon.css', encoding='utf-8').read()
 
-# Sun 亮色基底（只替换叶子值；var() 派生值自动跟随）
+# Sun 亮色基底 = Claude 设计语言（参考 awesome-design-md/claude/DESIGN.md）
+# canvas #faf9f5 奶油 / primary #cc785c 珊瑚 / ink #141413 暖墨 / hairline #e6dfd8
 palette = {
-  '--primary-color': '#b58900',
-  '--primary-color-rgb': '181, 137, 0',
-  '--bg-color': '#ffffff',
-  '--bg-color-dark': '#f5f6f7',
-  '--dark-trait': '#d0d7de',
-  '--light-trait-100': '#f0f2f4',
-  '--light-trait-200': '#e2e5e8',
-  '--light-trait-300': '#8b949e',
-  '--light-trait-400': '#6e7781',
-  '--text-color': '#1d1d1f',
-  '--text-color-secondary': '#6e6e73',
-  '--text-highlight-color': '#1d1d1f',
-  '--select-text-bg-color': 'rgba(0, 122, 255, 0.22)',
-  '--code-color': '#a626a4',
+  '--primary-color': '#cc785c',
+  '--primary-color-rgb': '204, 120, 92',
+  '--bg-color': '#faf9f5',
+  '--bg-color-dark': '#efe9de',
+  '--dark-trait': '#e6dfd8',
+  '--light-trait-100': '#f5f0e8',
+  '--light-trait-200': '#ebe6df',
+  '--light-trait-300': '#8e8b82',
+  '--light-trait-400': '#6c6a64',
+  '--text-color': '#141413',
+  '--text-color-secondary': '#6c6a64',
+  '--text-highlight-color': '#141413',
+  '--select-text-bg-color': 'rgba(204, 120, 92, 0.22)',
+  '--code-color': '#a9583e',
 }
 
 out, i = [], 0
@@ -91,22 +92,22 @@ PYEOF
 
 ### 基底色对照表（:root 叶子值）
 
-| 变量 | Moon（暗） | Sun（亮） | 语义 |
+| 变量 | Moon（暗） | Sun（亮 · Claude 风） | 语义 |
 |---|---|---|---|
-| `--primary-color` | `#fcba03` 金 | `#b58900` 深金 | 主强调 |
-| `--primary-color-rgb` | `252, 186, 3` | `181, 137, 0` | 主强调 rgb |
-| `--bg-color` | `#292929` | `#ffffff` | 画布 |
-| `--bg-color-dark` | `#1f1f1f` | `#f5f6f7` | 面板/侧栏 |
-| `--dark-trait` | `#141414` | `#d0d7de` | 最深描边 |
-| `--light-trait-100` | `#373737` | `#f0f2f4` | hover 底 |
-| `--light-trait-200` | `#545454` | `#e2e5e8` | 表格边/分隔 |
-| `--light-trait-300` | `#777` | `#8b949e` | 次级描边 |
-| `--light-trait-400` | `#8c8c8c` | `#6e7781` | heading 符 |
-| `--text-color` | `#f8f8f2` | `#1d1d1f` | 正文 |
-| `--text-color-secondary` | `#d2d3d3` | `#6e6e73` | 次级文字 |
-| `--text-highlight-color` | `#fff` | `#1d1d1f` | 高亮文字 |
-| `--select-text-bg-color` | `rgba(255,255,255,.2)` | `rgba(0,122,255,.22)` | 选中底 |
-| `--code-color` | `#f3b3f8` | `#a626a4` | 行内代码 |
+| `--primary-color` | `#fcba03` 金 | `#cc785c` 珊瑚 | 主强调 |
+| `--primary-color-rgb` | `252, 186, 3` | `204, 120, 92` | 主强调 rgb |
+| `--bg-color` | `#292929` | `#faf9f5` 奶油 | 画布 |
+| `--bg-color-dark` | `#1f1f1f` | `#efe9de` | 面板/侧栏 |
+| `--dark-trait` | `#141414` | `#e6dfd8` | 最深描边（hairline） |
+| `--light-trait-100` | `#373737` | `#f5f0e8` | hover 底 |
+| `--light-trait-200` | `#545454` | `#ebe6df` | 表格边/分隔 |
+| `--light-trait-300` | `#777` | `#8e8b82` | 次级描边 |
+| `--light-trait-400` | `#8c8c8c` | `#6c6a64` | heading 符 |
+| `--text-color` | `#f8f8f2` | `#141413` 暖墨 | 正文 |
+| `--text-color-secondary` | `#d2d3d3` | `#6c6a64` | 次级文字 |
+| `--text-highlight-color` | `#fff` | `#141413` | 高亮文字 |
+| `--select-text-bg-color` | `rgba(255,255,255,.2)` | `rgba(204,120,92,.22)` | 选中底 |
+| `--code-color` | `#f3b3f8` | `#a9583e` | 行内代码 |
 
 其余 :root 键全为 `var()` 派生，自动跟随，无需双写。正文区（:root 之外）moon/sun 逐字一致，含 `.md-diagram-panel`（mermaid）块——mermaid 为 **Apple 亮色画布卡**（`#f5f5f7` 底 + 白卡节点 + Action Blue `#0066cc` 强调 + 序号 marker 修复），两主题相同、不改色。
 
@@ -154,10 +155,11 @@ real = [(i, x, y) for i, (x, y) in enumerate(zip(m, s))
 print('real diffs:', len(real)); [print(i, x, '||', y) for i, x, y in real[:10]]
 assert not real
 # 必查：palette 必须生效（结构 diff 会跳过 :root 值，此处兜底防派生失效）
+# 锚点 = Claude 亮色（奶油画布 + 暖墨文字），改 palette 时同步更新本断言
 root = open('sun.css').read()
 i = root.find(':root {')
-assert i != -1 and '--bg-color: #ffffff' in root[i:root.find('}', i)+1] \
-   and '--text-color: #1d1d1f' in root[i:root.find('}', i)+1], 'palette NOT applied!'
+assert i != -1 and '--bg-color: #faf9f5' in root[i:root.find('}', i)+1] \
+   and '--text-color: #141413' in root[i:root.find('}', i)+1], 'palette NOT applied!'
 print('palette OK (sun :root is light)')
 "
 # 2) codeblock 镜像结构 diff
