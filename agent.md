@@ -33,8 +33,6 @@ Moon/codeblock.xydark.css    CodeMirror 暗色高亮（镜像源）
 Sun/codeblock.xylight.css    CodeMirror 亮色高亮（xydark 的亮色镜像）
 Claude/codeblock.xydark.css  Claude 深卡语法（one-dark 语义色 on #181715，独立）
 Claude/character.css         Claude 特色层（唯一手改；改后跑 SOP-C 拼入 claude.css）
-Moon/FiraMono-Regular.ttf    遗留未用（@font-face 已注释）
-Moon/FiraMono-Bold.ttf       遗留未用
 Readme.md
 agent.md
 ```
