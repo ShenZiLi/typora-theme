@@ -4,6 +4,7 @@
    派生自 Moon.css，两文件请同步维护。
    ============================================================ */
 @import './Sun/codeblock.xylight.css';
+@import './Sun/mermaid.css';
 
 @font-face {
   font-family: 'HONOR Sans Design Regular';

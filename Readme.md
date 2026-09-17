@@ -19,7 +19,7 @@
 
 - 🌗 **Moon / Sun 镜像**：共享同一套排版体系（字体、行高、间距、选择器逐字一致），切换不打乱阅读节奏
 - 🎨 **Claude 特色主题**：基底同源之上叠加完整 Claude 设计语言（参考 awesome-design-md/claude）——**衬线标题**（400 字重不粗体）、**深色代码卡**（奶油 × 深墨 `#181715` 节奏）、**珊瑚**链接与引用、Claude 奶油色 Mermaid
-- 📊 **亮色图表**：内建 Mermaid 亮色画布——Moon/Sun 为 Apple 风格（白卡 + Action Blue），Claude 为奶油卡 + 珊瑚强调；即使正文是暗色，图表也自成亮底
+- 📊 **亮色图表**：内建 Mermaid 亮色画布——Moon/Sun 为 Apple 风格（白卡 + Action Blue），Claude 为奶油卡 + 珊瑚强调；即使正文是暗色，图表也自成亮底。**复制/导出为图片时同样得到亮底**（并补回节点圆角），不会出现深色画布
 - 🔤 **字体统一**：正文 HONOR Sans Design Regular，代码 JetBrains Mono / Zconsola；Claude 主题标题额外采用衬线（Cormorant Garamond / 宋体系）
 - 🎨 **语义代码高亮**：Moon/Sun 用 GitHub 经典色（暗 xydark / 亮 xylight 镜像）；Claude 用深卡 one-dark 语法（暖 cream 文字）
 - 🧱 **零配置**：纯 CSS，无插件依赖，放进主题文件夹即可用
@@ -59,6 +59,7 @@
 
 ## 📄 更新日志
 
+- **2026-09-17**：修复「复制为图片 / 导出图片」的深色底问题 —— 新增 `Moon|Sun|Claude/mermaid.css`（被 Typora 采集进图片导出包装页），使 mermaid 复制出的图片带亮色画布并补回节点圆角，与编辑器观感一致（机制详见 `agent.md` 平台约束 #6）
 - **2026-09-08**：Moon / Sun / Claude 三主题发布 —— 由 Typora 默认主题（Notes Dark / Github）改造：统一字体、Moon/Sun 排版镜像、Apple 风格亮色 Mermaid、GitHub 语义代码高亮。Sun 白底金；Claude 奶油珊瑚（Claude 设计语言：衬线标题 / 深色代码卡 / 珊瑚 Mermaid，独立特色层 `Claude/character.css`）
 
 ## 🤝 致谢

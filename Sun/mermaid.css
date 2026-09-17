@@ -1,0 +1,24 @@
+/* ============================================================
+   mermaid.css · 复制/导出图片画布（Sun 亮色主题）
+   ------------------------------------------------------------
+   用途：让 Typora「复制为图片 / 导出图片」得到的图带 **亮色画布**
+   （#f5f5f7，与 Sun 的 mermaid 亮卡同色），避免出现透明底。
+   机制：Typora 把 href 含 "mermaid.css" 的样式表采集进图片导出包装页，
+   此处用 !important 反覆盖导出克隆被内联的底色。
+   作用域 body:has(> svg) 只匹配导出包装页，编辑器不受影响。
+   ============================================================ */
+
+html:has(> body > svg),
+body:has(> svg) {
+  background-color: #f5f5f7 !important;
+}
+
+body:has(> svg) > svg {
+  background: #f5f5f7 !important;
+}
+
+/* 补回导出时丢失的节点圆角 */
+body:has(> svg) svg .node rect {
+  rx: 8px !important;
+  ry: 8px !important;
+}

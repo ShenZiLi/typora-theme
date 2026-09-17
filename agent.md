@@ -32,6 +32,8 @@ claude.css                   亮色主题·Claude（SOP-C 重建 = moon 基底 +
 Moon/codeblock.xydark.css    CodeMirror 暗色高亮（镜像源）
 Sun/codeblock.xylight.css    CodeMirror 亮色高亮（xydark 的亮色镜像）
 Claude/codeblock.xydark.css  Claude 深卡语法（one-dark 语义色 on #181715，独立）
+Moon|Sun|Claude/mermaid.css  图片导出画布（复制 mermaid 图为图片时的亮底，
+                             被 Typora 采集注入导出包装页，见「Typora 平台约束」#6）
 Claude/character.css         Claude 特色层（唯一手改；改后跑 SOP-C 拼入 claude.css）
 Fonts/ZHonor.ttf              HONOR Sans Design Regular 打包字体（@font-face local 优先 + url 兜底，跨设备不缺失）
 Readme.md
@@ -43,7 +45,7 @@ agent.md
 moon.css 配色全走 `:root` CSS 变量，正文规则零硬编码色——这是可派生的前提（唯一硬编码色块是 mermaid Apple 卡，见设计基线）。改完 moon.css 后执行：
 
 ```bash
-cd "~/Library/Application Support/abnerworks.Typora/themes" && python3 << 'PYEOF'
+cd "$HOME/Library/Application Support/abnerworks.Typora/themes" && python3 << 'PYEOF'
 import re
 
 moon = open('moon.css', encoding='utf-8').read()
@@ -59,8 +61,8 @@ SUN = {
   '--select-text-bg-color': 'rgba(0, 122, 255, 0.22)', '--code-color': '#a626a4',
 }
 
-def derive(palette, import_line, header, out_file):
-    """moon.css 全文复制，仅替换 :root 基底值；结构逐字保留。"""
+def derive(palette, import_line, mermaid_import, header, out_file):
+    """moon.css 全文复制，仅替换 :root 基底值 + 两行 @import；结构逐字保留。"""
     out, i = [], 0
     while True:
         st = moon.find(':root {', i)
@@ -79,6 +81,7 @@ def derive(palette, import_line, header, out_file):
                            lambda m, k=k, v=v: m.group(1) + v + ';', block)
         out += [moon[i:st], block]; i = j + 1
     body = ''.join(out).replace("@import './Moon/codeblock.xydark.css';", import_line)
+    body = body.replace("@import './Moon/mermaid.css';", mermaid_import)
     open(out_file, 'w', encoding='utf-8').write(header + body)
 
 HEADER_SUN = ("/* ============================================================\n"
@@ -86,7 +89,7 @@ HEADER_SUN = ("/* ============================================================\n
               "   与 Moon 主题排版/字体/间距完全一致，仅配色为亮色。\n"
               "   派生自 Moon.css，两文件请同步维护。\n"
               "   ============================================================ */\n")
-derive(SUN, "@import './Sun/codeblock.xylight.css';", HEADER_SUN, 'sun.css')
+derive(SUN, "@import './Sun/codeblock.xylight.css';", "@import './Sun/mermaid.css';", HEADER_SUN, 'sun.css')
 print('sun.css regenerated')
 PYEOF
 ```
@@ -98,7 +101,7 @@ PYEOF
 **只改特色**（标题、代码卡、mermaid、引用等）→ 编辑 `Claude/character.css`，然后重建：
 
 ```bash
-cd "~/Library/Application Support/abnerworks.Typora/themes" && python3 << 'PYEOF'
+cd "$HOME/Library/Application Support/abnerworks.Typora/themes" && python3 << 'PYEOF'
 import re
 moon = open('moon.css', encoding='utf-8').read()
 
@@ -131,6 +134,8 @@ while True:
 body = ''.join(out)
 body = body.replace("@import './Moon/codeblock.xydark.css';",
                     "@import './Claude/codeblock.xydark.css';")
+body = body.replace("@import './Moon/mermaid.css';",
+                    "@import './Claude/mermaid.css';")
 HEADER = ("/* ============================================================\n"
           "   Claude (Light) · Typora Theme — Claude 设计语言（awesome-design-md/claude）\n"
           "   基底派生自 Moon.css（排版与 Moon/Sun 同源，勿手改基底排版）；\n"
@@ -176,6 +181,7 @@ PYEOF
 ## 校验（每次改完必跑）
 
 ```bash
+cd "$HOME/Library/Application Support/abnerworks.Typora/themes"
 # 1) sun 与 moon 结构一致（镜像契约；排除 header/@import/:root 值后 0 差异）
 python3 -c "
 import re
@@ -240,6 +246,10 @@ print('braces balanced')"
 3. 主题仍不可见时清缓存：退出后删 `~/Library/WebKit/abnerworks.Typora` 与 `~/Library/Caches/abnerworks.Typora`。
 4. APFS 大小写不敏感盘上改名用两步 `git mv A.css tmp.css && git mv tmp.css a.css`。
 5. 文件末尾追加内容前先确认有换行，否则会拼行（曾把 `.DS_Store` 拼成 `.workbuddy.DS_Store`）。
+6. **「复制为图片 / 导出图片」的底色机制（2026.09.17 定位并修复）**：复制 mermaid 图为图片时 Typora 走 `copyImage → f()`：克隆 SVG 并**只内联固定属性集**（backgroundColor/color/fill/stroke/strokeWidth/opacity/font-size/font-family/text-anchor/padding/margin，**不含 rx/ry**），底色回退 `getComputedStyle(document.body).backgroundColor`（Moon 下 = `--bg-color #292929`），判为亮色时反而清成透明；最后把 `href` 含 `mermaid.css` 的样式表**全部采集**进极简包装页 `<html style='margin:0;padding:0'><body style='margin:0;padding:0'>SVG` 截图。⇒ 暗色主题必然导出深底图，且这是**唯一可注入点**。
+   - 对策：本仓库三份 `Moon|Sun|Claude/mermaid.css`（靠 `@import` 进入 `document.styleSheets` 被采集），以 `body:has(> svg)` 限定「只作用于导出包装页」，`!important` 反覆盖克隆 svg 的内联底色 → 导出图得亮底 + 补回 `rx/ry` 圆角。
+   - 勿给包装页加 padding/margin：截图区域按原 svg 尺寸取，加了会裁切。
+   - 排查入口：`~/Library/Preferences/abnerworks.Typora.plist`（`theme` / `darkTheme` / `useDarkTheme` / `useSeparateDarkTheme` 决定深色模式用哪套主题）；实现全在 app 资源 `TypeMark/appsrc/main.js`。复现验证：把 moon.css + 一个 mermaid svg 放进本地页面，脚本复刻 `f()` 的克隆/内联/底色判定后截图比对像素。
 
 ## 设计基线（勿随意偏离）
 

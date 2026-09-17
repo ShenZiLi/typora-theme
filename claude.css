@@ -5,6 +5,7 @@
    重建方式见 agent.md SOP-C；特色只改 Claude/character.css。
    ============================================================ */
 @import './Claude/codeblock.xydark.css';
+@import './Claude/mermaid.css';
 
 @font-face {
   font-family: 'HONOR Sans Design Regular';
