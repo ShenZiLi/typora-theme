@@ -22,6 +22,7 @@
 - **`sun.css` 派生**：由 moon.css + SOP-A 生成（换金 palette），禁止手改 sun.css 排版。
 - **`claude.css` 重建**：由 moon.css 基底（Claude palette）+ SOP-C 拼接 `Claude/character.css`；**特色只改 character.css，基底排版改 moon.css 后重跑 SOP-C**。
 - 代码高亮三份独立：`Moon/codeblock.xydark.css`（暗源）↔ `Sun/codeblock.xylight.css`（亮镜像）；`Claude/codeblock.xydark.css`（Claude 深卡 one-dark 语法，独立）。
+- **图片导出画布**：写在 moon.css 基底（`.md-diagram-panel svg` 的 `background-color`，**必须 `color(srgb …)` 写法**）；Claude 在 character.css 覆盖为奶油色。机制与两个已证伪弯路见「Typora 平台约束」#6。
 
 ### 文件地图
 
@@ -32,8 +33,6 @@ claude.css                   亮色主题·Claude（SOP-C 重建 = moon 基底 +
 Moon/codeblock.xydark.css    CodeMirror 暗色高亮（镜像源）
 Sun/codeblock.xylight.css    CodeMirror 亮色高亮（xydark 的亮色镜像）
 Claude/codeblock.xydark.css  Claude 深卡语法（one-dark 语义色 on #181715，独立）
-Moon|Sun|Claude/mermaid.css  图片导出画布（复制 mermaid 图为图片时的亮底，
-                             被 Typora 采集注入导出包装页，见「Typora 平台约束」#6）
 Claude/character.css         Claude 特色层（唯一手改；改后跑 SOP-C 拼入 claude.css）
 Fonts/ZHonor.ttf              HONOR Sans Design Regular 打包字体（@font-face local 优先 + url 兜底，跨设备不缺失）
 Readme.md
@@ -61,8 +60,8 @@ SUN = {
   '--select-text-bg-color': 'rgba(0, 122, 255, 0.22)', '--code-color': '#a626a4',
 }
 
-def derive(palette, import_line, mermaid_import, header, out_file):
-    """moon.css 全文复制，仅替换 :root 基底值 + 两行 @import；结构逐字保留。"""
+def derive(palette, import_line, header, out_file):
+    """moon.css 全文复制，仅替换 :root 基底值；结构逐字保留。"""
     out, i = [], 0
     while True:
         st = moon.find(':root {', i)
@@ -81,7 +80,6 @@ def derive(palette, import_line, mermaid_import, header, out_file):
                            lambda m, k=k, v=v: m.group(1) + v + ';', block)
         out += [moon[i:st], block]; i = j + 1
     body = ''.join(out).replace("@import './Moon/codeblock.xydark.css';", import_line)
-    body = body.replace("@import './Moon/mermaid.css';", mermaid_import)
     open(out_file, 'w', encoding='utf-8').write(header + body)
 
 HEADER_SUN = ("/* ============================================================\n"
@@ -89,7 +87,7 @@ HEADER_SUN = ("/* ============================================================\n
               "   与 Moon 主题排版/字体/间距完全一致，仅配色为亮色。\n"
               "   派生自 Moon.css，两文件请同步维护。\n"
               "   ============================================================ */\n")
-derive(SUN, "@import './Sun/codeblock.xylight.css';", "@import './Sun/mermaid.css';", HEADER_SUN, 'sun.css')
+derive(SUN, "@import './Sun/codeblock.xylight.css';", HEADER_SUN, 'sun.css')
 print('sun.css regenerated')
 PYEOF
 ```
@@ -134,8 +132,6 @@ while True:
 body = ''.join(out)
 body = body.replace("@import './Moon/codeblock.xydark.css';",
                     "@import './Claude/codeblock.xydark.css';")
-body = body.replace("@import './Moon/mermaid.css';",
-                    "@import './Claude/mermaid.css';")
 HEADER = ("/* ============================================================\n"
           "   Claude (Light) · Typora Theme — Claude 设计语言（awesome-design-md/claude）\n"
           "   基底派生自 Moon.css（排版与 Moon/Sun 同源，勿手改基底排版）；\n"
@@ -246,16 +242,22 @@ print('braces balanced')"
 3. 主题仍不可见时清缓存：退出后删 `~/Library/WebKit/abnerworks.Typora` 与 `~/Library/Caches/abnerworks.Typora`。
 4. APFS 大小写不敏感盘上改名用两步 `git mv A.css tmp.css && git mv tmp.css a.css`。
 5. 文件末尾追加内容前先确认有换行，否则会拼行（曾把 `.DS_Store` 拼成 `.workbuddy.DS_Store`）。
-6. **「复制为图片 / 导出图片」的底色机制（2026.09.17 定位并修复）**：复制 mermaid 图为图片时 Typora 走 `copyImage → f()`：克隆 SVG 并**只内联固定属性集**（backgroundColor/color/fill/stroke/strokeWidth/opacity/font-size/font-family/text-anchor/padding/margin，**不含 rx/ry**），底色回退 `getComputedStyle(document.body).backgroundColor`（Moon 下 = `--bg-color #292929`），判为亮色时反而清成透明；最后把 `href` 含 `mermaid.css` 的样式表**全部采集**进极简包装页 `<html style='margin:0;padding:0'><body style='margin:0;padding:0'>SVG` 截图。⇒ 暗色主题必然导出深底图，且这是**唯一可注入点**。
-   - 对策：本仓库三份 `Moon|Sun|Claude/mermaid.css`（靠 `@import` 进入 `document.styleSheets` 被采集），以 `body:has(> svg)` 限定「只作用于导出包装页」，`!important` 反覆盖克隆 svg 的内联底色 → 导出图得亮底 + 补回 `rx/ry` 圆角。
-   - 勿给包装页加 padding/margin：截图区域按原 svg 尺寸取，加了会裁切。
-   - 排查入口：`~/Library/Preferences/abnerworks.Typora.plist`（`theme` / `darkTheme` / `useDarkTheme` / `useSeparateDarkTheme` 决定深色模式用哪套主题）；实现全在 app 资源 `TypeMark/appsrc/main.js`。复现验证：把 moon.css + 一个 mermaid svg 放进本地页面，脚本复刻 `f()` 的克隆/内联/底色判定后截图比对像素。
-
+6. **「复制为图片 / 导出图片」的底色机制（2026.09.17 定位并修复，勿再走弯路）**：右键图表「复制为图片」走 `copyImage → v → f()`：
+   - 克隆 SVG 并**只内联固定属性集**（backgroundColor/color/fill/stroke/strokeWidth/opacity/font-size/font-family/text-anchor/padding/margin，**不含 rx/ry**）；
+   - 底色取值顺序：克隆 svg 自身 computed `background-color`（非透明时）→ 否则 `getComputedStyle(document.body).backgroundColor`（Moon 下 = `--bg-color` #292929）；
+   - 亮度判定有坑：用 `/\d+/` 截该字符串 + `(299R+587G+114B)/256e3 < .5` → **判暗则原样保留、判亮则清成透明**；
+   - 包装页 = `<html style='margin:0;padding:0'><head><style>【采集】</style></head><body style='margin:0;padding:0'>SVG`，按 svg 原尺寸截图。
+   ⇒ 结论：**唯一可靠通道 = 给 `.md-diagram-panel svg` 设 `background-color: color(srgb …)`**（WebKit 会原样保留该写法：`"0.96"` 只解析出 0 与 96 → 判暗 → 底色被完整带进图片；写 `#hex`/`rgb()` 反而会被清成透明）。基底写在 moon.css、Claude 在 character.css 覆盖。
+   - ❌ 已证伪弯路：把规则放进主题 `@import` 的 `xxx/mermaid.css` —— 采集只遍历**顶层** `document.styleSheets`，@import 进来的样式表不在其中（只存在于 `CSSImportRule.styleSheet`），永远采集不到；能进采集的只有 index.html 里 `<link>` 的 `lib/diagram/css/mermaid.css`。
+   - ❌ 另一个误区：`--mermaid-background` 是 Typora 传给 mermaid 的 `themeVariables.background`，实测不落到 SVG 根元素的 background-color，不能用来控制画布。
+   - 副作用：导出图**节点圆角丢失**（rx/ry 不在内联属性集里），暂接受。
+   - 排查入口：`~/Library/Preferences/abnerworks.Typora.plist`（`theme`/`darkTheme`/`useDarkTheme`/`useSeparateDarkTheme`）；实现全在 `TypeMark/appsrc/main.js`。
+   - 无 GUI 验证法：本地页面放 moon.css + 真 mermaid 图（可复用 `~/…/node_modules/mermaid` 的 esm 包），Playwright **webkit** 里复刻克隆/内联/亮度判定并截图比对像素（设 `color(srgb 0.96 0.96 0.97)` → 画布 #f5f5f7 ✅；不设 → #292929 ❌）。
 ## 设计基线（勿随意偏离）
 
 - 正文字体：`"HONOR Sans Design Regular"` 本地字体栈（未装则回退系统栈），三主题基底一致。
 - 等宽字体：`'JetBrains Mono', 'HONOR Sans Design Regular', 'Zconsola', monospace`。
-- mermaid：**Moon/Sun** = Apple 亮色画布卡（`#f5f5f7` + Action Blue `#0066cc`，嵌在 moon.css 基底）；**Claude** = character.css 覆盖为 Claude 奶油卡（`#faf9f5` + 珊瑚 `#cc785c` + cream 节点）。
+- mermaid：**Moon/Sun** = Apple 亮色画布卡（`#f5f5f7` + Action Blue `#0066cc`，嵌在 moon.css 基底）；**Claude** = character.css 覆盖为 Claude 奶油卡（`#faf9f5` + 珊瑚 `#cc785c` + cream 节点）。。**复制/导出为图片**的画布取自 `.md-diagram-panel svg` 的 `background-color`（`color(srgb …)` 写法，见「Typora 平台约束」#6）
 - **Claude 特色**（character.css，依 awesome-design-md/claude DESIGN.md）：标题衬线 400 不粗体；链接珊瑚 + hairline 下划线；引用珊瑚左线；代码块深卡 `#181715`（cream↔dark 节奏）；行内代码 surface-card 底 + 深珊瑚字；表格 cream-strong 表头；图片/面板圆角 12px（rounded.lg）。
 - CSS 语法用 python 原子替换或整文件 Write，慎用多次 Edit（曾出现同文件连续 Edit 漏落盘）。
 

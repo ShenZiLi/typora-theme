@@ -146,6 +146,11 @@
   font-family: "HONOR Sans Design Regular", -apple-system, BlinkMacSystemFont,
                "Segoe UI", Roboto, sans-serif !important;
 }
+/* SVG 自身底色（复制为图片的画布来源）：color(srgb) 形式，视觉 = #faf9f5
+   机制见 moon.css 同名规则与 agent.md「Typora 平台约束」#6 */
+.md-diagram-panel svg {
+  background-color: color(srgb 0.98 0.976 0.96) !important;
+}
 /* 连接线：muted-soft 暖灰 */
 .md-diagram-panel svg .flowchart-link,
 .md-diagram-panel svg .edgePaths path,
