@@ -58,6 +58,10 @@ SUN = {
   '--light-trait-400': '#6e7781', '--text-color': '#1d1d1f',
   '--text-color-secondary': '#6e6e73', '--text-highlight-color': '#1d1d1f',
   '--select-text-bg-color': 'rgba(0, 122, 255, 0.22)', '--code-color': '#a626a4',
+  # 标题左色条（淡色六色相 红橙黄绿蓝紫）；白底上比 Moon 深一档才可见
+  '--heading-bar-1': '#d4706c', '--heading-bar-2': '#d9954f',
+  '--heading-bar-3': '#c4a838', '--heading-bar-4': '#5f9e63',
+  '--heading-bar-5': '#5589c4', '--heading-bar-6': '#8f7ac4',
 }
 
 def derive(palette, import_line, header, out_file):
@@ -111,6 +115,10 @@ CLAUDE = {   # 基底亮色 = 奶油画布 + 珊瑚（awesome-design-md/claude D
   '--light-trait-400': '#6c6a64', '--text-color': '#141413',
   '--text-color-secondary': '#6c6a64', '--text-highlight-color': '#141413',
   '--select-text-bg-color': 'rgba(204, 120, 92, 0.22)', '--code-color': '#a9583e',
+  # 标题左色条（淡色六色相）；米底上用低饱和暖调（莫兰迪），不抢珊瑚主色
+  '--heading-bar-1': '#c07a6e', '--heading-bar-2': '#c2915c',
+  '--heading-bar-3': '#b8a45c', '--heading-bar-4': '#7c9c78',
+  '--heading-bar-5': '#7a95b8', '--heading-bar-6': '#9a89b5',
 }
 out, i = [], 0
 while True:
@@ -165,6 +173,7 @@ PYEOF
 | `--text-highlight-color` | `#fff` | `#1d1d1f` | `#141413` | 高亮文字 |
 | `--select-text-bg-color` | `rgba(255,255,255,.2)` | `rgba(0,122,255,.22)` | `rgba(204,120,92,.22)` | 选中底 |
 | `--code-color` | `#f3b3f8` | `#a626a4` | `#a9583e` | 行内代码 |
+| `--heading-bar-1…6` | 淡：`#e69a9a` `#e8b489` `#e8d795` `#a9d6a9` `#9cc7e8` `#c3ade4` | 深一档：`#d4706c` `#d9954f` `#c4a838` `#5f9e63` `#5589c4` `#8f7ac4` | 莫兰迪：`#c07a6e` `#c2915c` `#b8a45c` `#7c9c78` `#7a95b8` `#9a89b5` | 标题左色条（红橙黄绿蓝紫） |
 
 其余 :root 键全为 `var()` 派生，自动跟随，无需三写。基底正文区 Moon/Sun 逐字一致；Claude 正文基底同源，但**渲染外观可能被 character.css 覆盖**（标题/代码/引用/表格/图片/mermaid），属预期。
 
@@ -183,7 +192,7 @@ python3 -c "
 import re
 def norm_lines(t, skip=0):
     lines = t.splitlines()[skip:]
-    k = re.compile(r'^\s*--(?:primary-color|primary-color-rgb|bg-color|bg-color-dark|dark-trait|light-trait-\d+|text-color|text-color-secondary|text-highlight-color|select-text-bg-color|code-color):')
+    k = re.compile(r'^\s*--(?:primary-color|primary-color-rgb|bg-color|bg-color-dark|dark-trait|light-trait-\d+|heading-bar-\d+|text-color|text-color-secondary|text-highlight-color|select-text-bg-color|code-color):')
     out = []
     for ln in lines:
         if ln.startswith('@import'): out.append('@IMPORT'); continue
@@ -202,6 +211,7 @@ def root_of(p):
 sr, cr = root_of('sun.css'), root_of('claude.css')
 assert '--bg-color: #ffffff' in sr and '--text-color: #1d1d1f' in sr and '--primary-color: #b58900' in sr, 'sun palette NOT applied'
 assert '--bg-color: #faf9f5' in cr and '--text-color: #141413' in cr and '--primary-color: #cc785c' in cr, 'claude palette NOT applied'
+assert '--heading-bar-1: #d4706c' in sr and '--heading-bar-1: #c07a6e' in cr, 'heading-bar palette NOT applied'
 print('palette OK (sun 白底金 / claude 奶油珊瑚)')
 "
 # 3) claude.css = moon 基底(仅 :root 值/@import 不同) + character 层（剥离后 0 差异）
@@ -209,7 +219,7 @@ python3 -c "
 import re
 def norm_lines(t, skip=0):
     lines = t.splitlines()[skip:]
-    k = re.compile(r'^\s*--(?:primary-color|primary-color-rgb|bg-color|bg-color-dark|dark-trait|light-trait-\d+|text-color|text-color-secondary|text-highlight-color|select-text-bg-color|code-color):')
+    k = re.compile(r'^\s*--(?:primary-color|primary-color-rgb|bg-color|bg-color-dark|dark-trait|light-trait-\d+|heading-bar-\d+|text-color|text-color-secondary|text-highlight-color|select-text-bg-color|code-color):')
     out = []
     for ln in lines:
         if ln.startswith('@import'): out.append('@IMPORT'); continue
@@ -256,7 +266,9 @@ print('braces balanced')"
 ## 设计基线（勿随意偏离）
 
 - 正文字体：`"HONOR Sans Design Regular"` 本地字体栈（未装则回退系统栈），三主题基底一致。
-- 等宽字体：`'JetBrains Mono', 'HONOR Sans Design Regular', 'Zconsola', monospace`。
+- 等宽字体：`'JetBrains Mono', 'HONOR Sans Design Regular', monospace`。
+- **标题层级记号（2026.09.30 加）**：H1–H6 各自左侧一道 3px 圆角色条，色相按 **红→橙→黄→绿→蓝→紫** 对应 H1→H6，颜色走 `:root --heading-bar-1..6`（三主题各一组值，见对照表）。实现要点：`::before` **绝对定位 `left:-13px`**（不占文本宽度，标题文字与正文严格左对齐）；条高固定 `height: 1em`（严格等于本级字号）配 `top` 居中（H1–H3 `0.1em`／H4–H6 `0.2em`）。⚠️ **不要用 `top`+`bottom` 撑高**——H1/H2 带 `padding-bottom: 0.3em`，会让条高随盒高失真、比字矮。
+- **加粗（2026.09.30 修）**：`Fonts/ZHonor.ttf` 只有 Regular 一个字面（`usWeightClass=400`，无 `fvar`）⇒ **禁止再写 `font-weight: bold` 的 `@font-face`**，否则浏览器认定粗体字面已存在、**跳过合成加粗**，`**粗体**` 渲染与正文无异。正确写法：删掉该伪字面 + `strong, b { font-weight: bold; -webkit-text-stroke: 0.02em currentColor; }`（描边补足合成加粗偏弱的幅度）。
 - mermaid：**Moon/Sun** = Apple 亮色画布卡（`#f5f5f7` + Action Blue `#0066cc`，嵌在 moon.css 基底）；**Claude** = character.css 覆盖为 Claude 奶油卡（`#faf9f5` + 珊瑚 `#cc785c` + cream 节点）。。**复制/导出为图片**的画布取自 `.md-diagram-panel svg` 的 `background-color`（`color(srgb …)` 写法，见「Typora 平台约束」#6）
 - **Claude 特色**（character.css，依 awesome-design-md/claude DESIGN.md）：标题衬线 400 不粗体；链接珊瑚 + hairline 下划线；引用珊瑚左线；代码块深卡 `#181715`（cream↔dark 节奏）；行内代码 surface-card 底 + 深珊瑚字；表格 cream-strong 表头；图片/面板圆角 12px（rounded.lg）。
 - CSS 语法用 python 原子替换或整文件 Write，慎用多次 Edit（曾出现同文件连续 Edit 漏落盘）。

@@ -12,13 +12,6 @@
   src: local("HONOR Sans Design Regular"), url("./Fonts/ZHonor.ttf") format("truetype");
 }
 
-@font-face {
-  font-family: 'HONOR Sans Design Regular';
-  font-style: normal;
-  font-weight: bold;
-  src: local("HONOR Sans Design Regular"), url("./Fonts/ZHonor.ttf") format("truetype");
-}
-
 :root {
   --primary-color: #b58900;
   --primary-color-rgb: 181, 137, 0;
@@ -48,6 +41,13 @@
   --font-family: "HONOR Sans Design Regular", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Ubuntu, "Helvetica Neue", sans-serif;
   /*等宽字体*/
   --monospace: 'JetBrains Mono', 'HONOR Sans Design Regular', monospace;
+  /*标题层级左色条（淡色六色相：红橙黄绿蓝紫）*/
+  --heading-bar-1: #d4706c;
+  --heading-bar-2: #d9954f;
+  --heading-bar-3: #c4a838;
+  --heading-bar-4: #5f9e63;
+  --heading-bar-5: #5589c4;
+  --heading-bar-6: #8f7ac4;
   --heading-char-color: var(--light-trait-400);
   --color-popover-bg-color: var(--text-color);
   --rawblock-edit-panel-bd: var(--bg-color-dark);
@@ -74,6 +74,16 @@ body {
   -webkit-font-smoothing: antialiased;
   color: var(--text-color);
   line-height: 1.6;
+}
+
+/*加粗：字体包 ZHonor.ttf 仅含 Regular 字面（usWeightClass 400），
+  不能再为它声明 font-weight: bold——那样浏览器会认定粗体字面已存在而跳过合成加粗；
+  留空即触发浏览器合成加粗，**粗体** 才会有效果*/
+strong,
+b {
+  font-weight: bold;
+  /*ZHonor 仅 Regular 字面时浏览器合成加粗偏弱，叠一层极细描边补足*/
+  -webkit-text-stroke: 0.02em currentColor;
 }
 
 #write {
@@ -143,6 +153,58 @@ h6 code {
   font-size: inherit;
 }
 
+/*标题层级：左色条（淡色六色相，红→橙→黄→绿→蓝→紫；绝对定位不占文本宽度）
+  高度锁定 1em（≈ 字身高）并垂直居中于行盒，不随盒高/padding 变化*/
+h1::before,
+h2::before,
+h3::before,
+h4::before,
+h5::before,
+h6::before {
+  content: "";
+  position: absolute;
+  left: -13px;
+  width: 3px;
+  height: 1em;
+  border-radius: 2px;
+}
+
+h1::before,
+h2::before,
+h3::before {
+  top: 0.1em;
+}
+
+h4::before,
+h5::before,
+h6::before {
+  top: 0.2em;
+}
+
+h1::before {
+  background-color: var(--heading-bar-1);
+}
+
+h2::before {
+  background-color: var(--heading-bar-2);
+}
+
+h3::before {
+  background-color: var(--heading-bar-3);
+}
+
+h4::before {
+  background-color: var(--heading-bar-4);
+}
+
+h5::before {
+  background-color: var(--heading-bar-5);
+}
+
+h6::before {
+  background-color: var(--heading-bar-6);
+}
+
 h1 {
   padding-bottom: 0.3em;
   font-size: 1.8em;
@@ -166,6 +228,7 @@ h4 {
 
 h5 {
   font-size: 1em;
+  color: var(--text-color-secondary);
 }
 
 h6 {
