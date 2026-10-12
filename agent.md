@@ -243,6 +243,14 @@ diff <(sed 's/#[0-9A-Fa-f]\{3,8\}/#X/g' Moon/codeblock.xydark.css) \
 python3 -c "for p in ['moon.css','sun.css','claude.css','Claude/character.css','Claude/codeblock.xydark.css']:
     t=open(p).read(); assert t.count('{')==t.count('}'), p
 print('braces balanced')"
+# 6) 标题文字色一致性（H1–H6 一律正文色，不得出现次级灰）
+python3 -c "
+for p in ['moon.css','sun.css','claude.css']:
+    t = open(p).read()
+    assert 'color: var(--light-trait-300)' not in t, p + ' 标题仍有次级灰'
+    assert 'color: var(--text-color-secondary);\n}\n\nh6' not in t, p + ' h5 后仍有次级灰'
+assert '#write h5 {\n  font-size: 1.05em !important;\n  color' not in open('claude.css').read(), 'character 层 h5 仍覆盖颜色'
+print('heading color uniform OK')"
 ```
 
 ## Typora 平台约束（踩过的坑，勿再犯）
@@ -267,7 +275,7 @@ print('braces balanced')"
 
 - 正文字体：`"HONOR Sans Design Regular"` 本地字体栈（未装则回退系统栈），三主题基底一致。
 - 等宽字体：`'JetBrains Mono', 'HONOR Sans Design Regular', monospace`。
-- **标题层级记号（2026.09.30 加）**：H1–H6 各自左侧一道 3px 圆角色条，色相按 **红→橙→黄→绿→蓝→紫** 对应 H1→H6，颜色走 `:root --heading-bar-1..6`（三主题各一组值，见对照表）。实现要点：`::before` **绝对定位 `left:-13px`**（不占文本宽度，标题文字与正文严格左对齐）；条高固定 `height: 1em`（严格等于本级字号）配 `top` 居中（H1–H3 `0.1em`／H4–H6 `0.2em`）。⚠️ **不要用 `top`+`bottom` 撑高**——H1/H2 带 `padding-bottom: 0.3em`，会让条高随盒高失真、比字矮。
+- **标题层级记号（2026.09.30 加）**：H1–H6 各自左侧一道 3px 圆角色条，色相按 **红→橙→黄→绿→蓝→紫** 对应 H1→H6，颜色走 `:root --heading-bar-1..6`（三主题各一组值，见对照表）。实现要点：`::before` **绝对定位 `left:-13px`**（不占文本宽度，标题文字与正文严格左对齐）；条高固定 `height: 1em`（严格等于本级字号）配 `top` 居中（H1–H3 `0.1em`／H4–H6 `0.2em`）。⚠️ **不要用 `top`+`bottom` 撑高**——H1/H2 带 `padding-bottom: 0.3em`，会让条高随盒高失真、比字矮。**标题文字色一律取正文色**（H1–H6 全 `var(--text-color)`；Claude 由 character 层统一给 `#141413`）——层级只由字号 + 色条表达，⚠️ **勿再给 h5/h6 或任何级别标题加次级灰**（暗底 #777 显脏、亮底显淡；2026.10.12 立立否掉）。
 - **加粗（2026.09.30 修）**：`Fonts/ZHonor.ttf` 只有 Regular 一个字面（`usWeightClass=400`，无 `fvar`）⇒ **禁止再写 `font-weight: bold` 的 `@font-face`**，否则浏览器认定粗体字面已存在、**跳过合成加粗**，`**粗体**` 渲染与正文无异。正确写法：删掉该伪字面 + `strong, b { font-weight: bold; -webkit-text-stroke: 0.02em currentColor; }`（描边补足合成加粗偏弱的幅度）。
 - mermaid：**Moon/Sun** = Apple 亮色画布卡（`#f5f5f7` + Action Blue `#0066cc`，嵌在 moon.css 基底）；**Claude** = character.css 覆盖为 Claude 奶油卡（`#faf9f5` + 珊瑚 `#cc785c` + cream 节点）。。**复制/导出为图片**的画布取自 `.md-diagram-panel svg` 的 `background-color`（`color(srgb …)` 写法，见「Typora 平台约束」#6）
 - **Claude 特色**（character.css，依 awesome-design-md/claude DESIGN.md）：标题衬线 400 不粗体；链接珊瑚 + hairline 下划线；引用珊瑚左线；代码块深卡 `#181715`（cream↔dark 节奏）；行内代码 surface-card 底 + 深珊瑚字；表格 cream-strong 表头；图片/面板圆角 12px（rounded.lg）。

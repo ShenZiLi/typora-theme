@@ -226,14 +226,14 @@ h4 {
   font-size: 1.2em;
 }
 
+/*标题文字色：H1–H6 一律继承正文色，层级只靠字号 + 左色条区分
+  （勿再给 h5/h6 加次级灰，暗底上会显脏、亮底上会显淡）*/
 h5 {
   font-size: 1em;
-  color: var(--text-color-secondary);
 }
 
 h6 {
   font-size: 1em;
-  color: var(--light-trait-300);
 }
 
 p,
