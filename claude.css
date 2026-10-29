@@ -156,46 +156,40 @@ h6 code {
 
 /*标题层级：左色条（淡色六色相，红→橙→黄→绿→蓝→紫；绝对定位不占文本宽度）
   高度锁定 1em（≈ 字身高）并垂直居中于行盒，不随盒高/padding 变化
-  ⚠️ 编辑态（光标进入标题）必须与常态完全一致：Typora 此时会给标题加
-     .md-expand/.md-focus 并插入 # 标记（.md-meta），几何一律 !important 锁死 */
-h1::before,
-h2::before,
-h3::before,
-h4::before,
-h5::before,
-h6::before {
-  content: "";
+  ⚠️ 编辑态冲突（2026.10.29 定位）：Typora 内置 base-control.css 有
+     h1..h6.md-focus:before{content:'h3';border:1px solid;border-radius:3px;
+       left:-1.642857143rem;top:.357142857rem;font-size:9px;padding:0 2px}
+     光标一进标题就把本主题的色条 ::before 抢成 "h3" 徽标 ⇒ 内容撑宽 + 边框展开，
+     视觉变成矮胖圆角块，旁边还挂着灰色 h3 字样。故色条一律 #write 前缀 + !important 锁死。*/
+#write h1::before,
+#write h2::before,
+#write h3::before,
+#write h4::before,
+#write h5::before,
+#write h6::before {
+  content: "" !important;
   position: absolute;
-  left: -13px;
+  left: -13px !important;
   width: 3px !important;
-  min-width: 3px;
-  max-width: 3px;
   height: 1em !important;
-  border-radius: 2px;
+  font-size: inherit !important;   /* Typora 给了 9px，会把 1em 算错 ⇒ 条变矮 */
+  border: 0 !important;
+  padding: 0 !important;
+  border-radius: 2px !important;
   pointer-events: none;
   z-index: 2;
 }
 
-/*编辑态插入的 # 标记：常态本无，强制不显示（露出灰色 #### 会挤歪色条视觉）*/
-#write h1 .md-meta,
-#write h2 .md-meta,
-#write h3 .md-meta,
-#write h4 .md-meta,
-#write h5 .md-meta,
-#write h6 .md-meta {
-  display: none !important;
+#write h1::before,
+#write h2::before,
+#write h3::before {
+  top: 0.1em !important;
 }
 
-h1::before,
-h2::before,
-h3::before {
-  top: 0.1em;
-}
-
-h4::before,
-h5::before,
-h6::before {
-  top: 0.2em;
+#write h4::before,
+#write h5::before,
+#write h6::before {
+  top: 0.2em !important;
 }
 
 h1::before {

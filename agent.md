@@ -271,6 +271,12 @@ print('heading color uniform OK')"
    - 副作用：导出图**节点圆角丢失**（rx/ry 不在内联属性集里），暂接受。
    - 排查入口：`~/Library/Preferences/abnerworks.Typora.plist`（`theme`/`darkTheme`/`useDarkTheme`/`useSeparateDarkTheme`）；实现全在 `TypeMark/appsrc/main.js`。
    - 无 GUI 验证法：本地页面放 moon.css + 真 mermaid 图（可复用 `~/…/node_modules/mermaid` 的 esm 包），Playwright **webkit** 里复刻克隆/内联/亮度判定并截图比对像素（设 `color(srgb 0.96 0.96 0.97)` → 画布 #f5f5f7 ✅；不设 → #292929 ❌）。
+7. **标题左色条与 Typora 编辑态徽标抢同一个 `::before`（2026.10.29 定位）**：内置 `TypeMark/style/base-control.css` 有
+   `h1..h6.md-focus:before{content:'h1'..'h6';border:1px solid;border-radius:3px;position:absolute;left:-1.64rem;top:.357rem;font-size:9px;padding:0 2px}`。
+   光标一进标题（`.md-focus`）就把主题色条的 `::before` 覆盖成 "h3" 徽标 ⇒ **内容撑宽 + 1px 边框 + `font-size:9px` 让 `height:1em` 只算出 9px**，视觉是矮胖圆角块外加灰色 h3 字样。
+   修法（已固化在 moon.css）：色条选择器一律加 `#write` 前缀，`content/border/padding/left/width/height/top` 全 `!important`，**并补 `font-size: inherit !important`**（否则 1em 以 Typora 的 9px 为基准，条变矮）。
+   验证：本地页面先 `<style>` 灌入上述 Typora 规则、再 `<link>` moon.css，对比 `.md-focus` 行与常态行像素一致。
+
 ## 设计基线（勿随意偏离）
 
 - 正文字体：`"HONOR Sans Design Regular"` 本地字体栈（未装则回退系统栈），三主题基底一致。
