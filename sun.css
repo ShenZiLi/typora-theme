@@ -18,6 +18,8 @@
 
   --bg-color: #ffffff;
   --bg-color-dark: #f5f6f7;
+  /*打印 / 导出 PDF 纸面底色（Moon 保持暗底纸面；Sun 白纸、Claude 奶油纸由派生 palette 覆盖）*/
+  --print-bg: #ffffff;
   --dark-trait: #d0d7de;
   --light-trait-100: #f0f2f4;
   --light-trait-200: #e2e5e8;
@@ -858,4 +860,49 @@ code {
 /* 正文图片圆角 */
 #write img {
   border-radius: 8px;
+}
+
+/* ============================================================
+   打印 / 导出 PDF：纸面底色锚定主题画布
+   Typora「导出 PDF」会把编辑器当前外观的底色一起带进导出文件
+   （暗色外观下 = Moon 的 #292929），即使导出主题选了 Sun，
+   也会得到「深底 + 深字」的错配。这里在 @media print 内用 !important
+   把 html / body / #write 的底色拉回 --print-bg（Sun 白、Claude 奶油）。
+   ============================================================ */
+@media print {
+  /*选择器刻意抬特异性：被 Typora 注入的同名规则（html/…/#write）即使排在后面也压不住*/
+  html:root {
+    background: var(--print-bg) !important;
+    background-color: var(--print-bg) !important;
+  }
+
+  body.typora-export,
+  body.typora-export .typora-export-content,
+  body.typora-export #write {
+    background: var(--print-bg) !important;
+    background-color: var(--print-bg) !important;
+  }
+
+  /*保留代码块 / 表格底纹等主题色块*/
+  html:root {
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
+
+  /*编辑态浮层不进入 PDF*/
+  .code-tooltip,
+  .md-rawblock-tooltip {
+    display: none !important;
+  }
+
+  /*标题不与其后正文拆到两页*/
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6 {
+    break-after: avoid;
+    page-break-after: avoid;
+  }
 }

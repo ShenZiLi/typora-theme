@@ -53,6 +53,7 @@ moon = open('moon.css', encoding='utf-8').read()
 SUN = {
   '--primary-color': '#b58900', '--primary-color-rgb': '181, 137, 0',
   '--bg-color': '#ffffff', '--bg-color-dark': '#f5f6f7',
+  '--print-bg': '#ffffff',
   '--dark-trait': '#d0d7de', '--light-trait-100': '#f0f2f4',
   '--light-trait-200': '#e2e5e8', '--light-trait-300': '#8b949e',
   '--light-trait-400': '#6e7781', '--text-color': '#1d1d1f',
@@ -110,6 +111,7 @@ moon = open('moon.css', encoding='utf-8').read()
 CLAUDE = {   # 基底亮色 = 奶油画布 + 珊瑚（awesome-design-md/claude DESIGN.md）
   '--primary-color': '#cc785c', '--primary-color-rgb': '204, 120, 92',
   '--bg-color': '#faf9f5', '--bg-color-dark': '#efe9de',
+  '--print-bg': '#faf9f5',
   '--dark-trait': '#e6dfd8', '--light-trait-100': '#f5f0e8',
   '--light-trait-200': '#ebe6df', '--light-trait-300': '#8e8b82',
   '--light-trait-400': '#6c6a64', '--text-color': '#141413',
@@ -163,6 +165,7 @@ PYEOF
 | `--primary-color-rgb` | `252, 186, 3` | `181, 137, 0` | `204, 120, 92` | 主强调 rgb |
 | `--bg-color` | `#292929` | `#ffffff` | `#faf9f5` 奶油 | 画布 |
 | `--bg-color-dark` | `#1f1f1f` | `#f5f6f7` | `#efe9de` | 面板/侧栏 |
+| `--print-bg` | `#292929` | `#ffffff` | `#faf9f5` | 导出 PDF 纸面底色（见「平台约束」#8） |
 | `--dark-trait` | `#141414` | `#d0d7de` | `#e6dfd8` | 最深描边（hairline） |
 | `--light-trait-100` | `#373737` | `#f0f2f4` | `#f5f0e8` | hover 底 |
 | `--light-trait-200` | `#545454` | `#e2e5e8` | `#ebe6df` | 表格边/分隔 |
@@ -192,7 +195,7 @@ python3 -c "
 import re
 def norm_lines(t, skip=0):
     lines = t.splitlines()[skip:]
-    k = re.compile(r'^\s*--(?:primary-color|primary-color-rgb|bg-color|bg-color-dark|dark-trait|light-trait-\d+|heading-bar-\d+|text-color|text-color-secondary|text-highlight-color|select-text-bg-color|code-color):')
+    k = re.compile(r'^\s*--(?:primary-color|primary-color-rgb|bg-color|bg-color-dark|dark-trait|light-trait-\d+|heading-bar-\d+|print-bg|text-color|text-color-secondary|text-highlight-color|select-text-bg-color|code-color):')
     out = []
     for ln in lines:
         if ln.startswith('@import'): out.append('@IMPORT'); continue
@@ -212,6 +215,7 @@ sr, cr = root_of('sun.css'), root_of('claude.css')
 assert '--bg-color: #ffffff' in sr and '--text-color: #1d1d1f' in sr and '--primary-color: #b58900' in sr, 'sun palette NOT applied'
 assert '--bg-color: #faf9f5' in cr and '--text-color: #141413' in cr and '--primary-color: #cc785c' in cr, 'claude palette NOT applied'
 assert '--heading-bar-1: #d4706c' in sr and '--heading-bar-1: #c07a6e' in cr, 'heading-bar palette NOT applied'
+assert '--print-bg: #ffffff' in sr and '--print-bg: #faf9f5' in cr, 'print-bg palette NOT applied'
 print('palette OK (sun 白底金 / claude 奶油珊瑚)')
 "
 # 3) claude.css = moon 基底(仅 :root 值/@import 不同) + character 层（剥离后 0 差异）
@@ -219,7 +223,7 @@ python3 -c "
 import re
 def norm_lines(t, skip=0):
     lines = t.splitlines()[skip:]
-    k = re.compile(r'^\s*--(?:primary-color|primary-color-rgb|bg-color|bg-color-dark|dark-trait|light-trait-\d+|heading-bar-\d+|text-color|text-color-secondary|text-highlight-color|select-text-bg-color|code-color):')
+    k = re.compile(r'^\s*--(?:primary-color|primary-color-rgb|bg-color|bg-color-dark|dark-trait|light-trait-\d+|heading-bar-\d+|print-bg|text-color|text-color-secondary|text-highlight-color|select-text-bg-color|code-color):')
     out = []
     for ln in lines:
         if ln.startswith('@import'): out.append('@IMPORT'); continue
@@ -251,6 +255,14 @@ for p in ['moon.css','sun.css','claude.css']:
     assert 'color: var(--text-color-secondary);\n}\n\nh6' not in t, p + ' h5 后仍有次级灰'
 assert '#write h5 {\n  font-size: 1.05em !important;\n  color' not in open('claude.css').read(), 'character 层 h5 仍覆盖颜色'
 print('heading color uniform OK')"
+# 7) 导出 PDF 底色锚点（三主题都要有 --print-bg 与 @media print 兜底）
+python3 -c "
+for p in ['moon.css','sun.css','claude.css']:
+    t = open(p).read()
+    assert '--print-bg:' in t, p + ' 缺 --print-bg'
+    assert '@media print' in t and 'var(--print-bg) !important' in t, p + ' 缺导出底色兜底'
+assert '--print-bg: #ffffff' in open('sun.css').read(), 'sun 导出纸面应为白'
+print('print canvas OK')"
 ```
 
 ## Typora 平台约束（踩过的坑，勿再犯）
@@ -276,6 +288,10 @@ print('heading color uniform OK')"
    光标一进标题（`.md-focus`）就把主题色条的 `::before` 覆盖成 "h3" 徽标 ⇒ **内容撑宽 + 1px 边框 + `font-size:9px` 让 `height:1em` 只算出 9px**，视觉是矮胖圆角块外加灰色 h3 字样。
    修法（已固化在 moon.css）：色条选择器一律加 `#write` 前缀，`content/border/padding/left/width/height/top` 全 `!important`，**并补 `font-size: inherit !important`**（否则 1em 以 Typora 的 9px 为基准，条变矮）。
    验证：本地页面先 `<style>` 灌入上述 Typora 规则、再 `<link>` moon.css，对比 `.md-focus` 行与常态行像素一致。
+8. **「导出 PDF」会把编辑器当前外观的底色带进文件（2026.11.03 修复）**：Typora 在暗色外观下（plist `useDarkTheme=1` + `darkTheme=Moon`）导出时，即使 `export.pdf.exportTheme=sun`，页面底色仍是 Moon 的 `#292929`，而正文/链接用 Sun 的 `#1d1d1f`/`#b58900` ⇒ **深底 + 深字**，且内容区还残留一圈 1px 白框。实测该暗色不受 `:root --bg-color` 控制（字号、表格线、mermaid 卡全是 Sun 值，只有底色是 Moon 的），属 Typora 侧注入的**字面色**，只能在 `@media print` 内压回去。
+   ⇒ 固化修法：`:root` 增加 `--print-bg`（Moon `#292929` / Sun `#ffffff` / Claude `#faf9f5`），moon.css 末尾 `@media print` 用**抬高特异性的选择器 + `!important`**（`html:root`、`body.typora-export`、`body.typora-export .typora-export-content`、`body.typora-export #write`）把底色锁回 `--print-bg`。用普通 `html, body, #write` 会被后注入的同名规则压掉——这是第一版没生效的原因。
+   - 无 GUI 验证法：`@media print` 复刻导出 DOM（`<style>base.css</style>` 在前 + `<style>主题</style>` + `<body class="typora-export typora-print"><div class="typora-export-content"><div id="write">`），再追加一段敌意样式 `html/body/.typora-export-content/#write { background-color:#292929 !important }`，用 Chromium 无头 `--print-to-pdf` 出图后统计内容流里的填充色：修好 = 全是 `--print-bg`，修坏 = 出现 `#292929`。
+   - Moon 刻意保持暗底纸面（主题身份）；要白纸导出就该走 Sun / Claude。
 
 ## 设计基线（勿随意偏离）
 

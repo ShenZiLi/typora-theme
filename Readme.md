@@ -59,6 +59,7 @@
 
 ## 📄 更新日志
 
+- **2026-11-03**：修复「导出 PDF 是深底」—— 暗色外观下导出时 Typora 会把编辑器底色（Moon `#292929`）带进文件，正文却是 Sun 的深色，得到深底深字 + 一圈白边。新增 `:root --print-bg`（Moon 暗 / Sun 白 / Claude 奶油）并在 `@media print` 内以抬高特异性的 `!important` 规则锁回纸面底色；机制与无 GUI 验证法见 `agent.md`「Typora 平台约束」#8
 - **2026-09-17**：修复「复制为图片」的深色底问题 —— 为 `.md-diagram-panel svg` 显式声明画布底色（`color(srgb …)` 写法：视觉 = Moon/Sun `#f5f5f7`、Claude `#faf9f5`），使复制出的图片自带亮色画布，与编辑器观感一致。机制与两个已证伪方案详见 `agent.md`「Typora 平台约束」#6
 - **2026-09-08**：Moon / Sun / Claude 三主题发布 —— 由 Typora 默认主题（Notes Dark / Github）改造：统一字体、Moon/Sun 排版镜像、Apple 风格亮色 Mermaid、GitHub 语义代码高亮。Sun 白底金；Claude 奶油珊瑚（Claude 设计语言：衬线标题 / 深色代码卡 / 珊瑚 Mermaid，独立特色层 `Claude/character.css`）
 
