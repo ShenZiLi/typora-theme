@@ -67,6 +67,28 @@
   --table-bg-color: var(--bg-color);
 }
 
+/* ------------------------------------------------------------
+   纸面底色 · 无条件锁定（编辑态与导出态同色）
+   Typora 导出 PDF 时会把编辑器当前外观的底色带进文件，出现
+   「导出主题是 Sun、纸面却是 Moon 深灰」。这里**不依赖**
+   @media print——导出管线会丢弃或不应用打印块——而是直接把
+   html / body / 正文容器锁到 --print-bg：
+     Moon #292929 · Sun #ffffff · Claude #faf9f5
+   三者 --print-bg 均等于各自编辑态底色，编辑观感零变化。
+   ------------------------------------------------------------ */
+html,
+html:root {
+  background-color: var(--print-bg) !important;
+  background-image: none !important;
+}
+
+body,
+body.typora-export,
+body.typora-export .typora-export-content,
+body.typora-export #write {
+  background-color: var(--print-bg) !important;
+}
+
 html {
   font-size: var(--font-size);
 }

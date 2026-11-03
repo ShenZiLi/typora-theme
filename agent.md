@@ -255,12 +255,14 @@ for p in ['moon.css','sun.css','claude.css']:
     assert 'color: var(--text-color-secondary);\n}\n\nh6' not in t, p + ' h5 后仍有次级灰'
 assert '#write h5 {\n  font-size: 1.05em !important;\n  color' not in open('claude.css').read(), 'character 层 h5 仍覆盖颜色'
 print('heading color uniform OK')"
-# 7) 导出 PDF 底色锚点（三主题都要有 --print-bg 与 @media print 兜底）
+# 7) 导出 PDF 底色锚点（三主题都要有 --print-bg + 不依赖媒体类型的无条件锁底）
 python3 -c "
 for p in ['moon.css','sun.css','claude.css']:
     t = open(p).read()
     assert '--print-bg:' in t, p + ' 缺 --print-bg'
-    assert '@media print' in t and 'var(--print-bg) !important' in t, p + ' 缺导出底色兜底'
+    # 必须是无条件规则（Typora 导出不应用 @media print）
+    assert 'html:root {\n  background-color: var(--print-bg) !important;' in t, p + ' 缺 html 无条件锁底'
+    assert 'body.typora-export #write {\n  background-color: var(--print-bg) !important;' in t, p + ' 缺 #write 锁底'
 assert '--print-bg: #ffffff' in open('sun.css').read(), 'sun 导出纸面应为白'
 print('print canvas OK')"
 ```
@@ -288,10 +290,15 @@ print('print canvas OK')"
    光标一进标题（`.md-focus`）就把主题色条的 `::before` 覆盖成 "h3" 徽标 ⇒ **内容撑宽 + 1px 边框 + `font-size:9px` 让 `height:1em` 只算出 9px**，视觉是矮胖圆角块外加灰色 h3 字样。
    修法（已固化在 moon.css）：色条选择器一律加 `#write` 前缀，`content/border/padding/left/width/height/top` 全 `!important`，**并补 `font-size: inherit !important`**（否则 1em 以 Typora 的 9px 为基准，条变矮）。
    验证：本地页面先 `<style>` 灌入上述 Typora 规则、再 `<link>` moon.css，对比 `.md-focus` 行与常态行像素一致。
-8. **「导出 PDF」会把编辑器当前外观的底色带进文件（2026.11.03 修复）**：Typora 在暗色外观下（plist `useDarkTheme=1` + `darkTheme=Moon`）导出时，即使 `export.pdf.exportTheme=sun`，页面底色仍是 Moon 的 `#292929`，而正文/链接用 Sun 的 `#1d1d1f`/`#b58900` ⇒ **深底 + 深字**，且内容区还残留一圈 1px 白框。实测该暗色不受 `:root --bg-color` 控制（字号、表格线、mermaid 卡全是 Sun 值，只有底色是 Moon 的），属 Typora 侧注入的**字面色**，只能在 `@media print` 内压回去。
-   ⇒ 固化修法：`:root` 增加 `--print-bg`（Moon `#292929` / Sun `#ffffff` / Claude `#faf9f5`），moon.css 末尾 `@media print` 用**抬高特异性的选择器 + `!important`**（`html:root`、`body.typora-export`、`body.typora-export .typora-export-content`、`body.typora-export #write`）把底色锁回 `--print-bg`。用普通 `html, body, #write` 会被后注入的同名规则压掉——这是第一版没生效的原因。
-   - 无 GUI 验证法：`@media print` 复刻导出 DOM（`<style>base.css</style>` 在前 + `<style>主题</style>` + `<body class="typora-export typora-print"><div class="typora-export-content"><div id="write">`），再追加一段敌意样式 `html/body/.typora-export-content/#write { background-color:#292929 !important }`，用 Chromium 无头 `--print-to-pdf` 出图后统计内容流里的填充色：修好 = 全是 `--print-bg`，修坏 = 出现 `#292929`。
-   - Moon 刻意保持暗底纸面（主题身份）；要白纸导出就该走 Sun / Claude。
+8. **「导出 PDF」会把编辑器当前外观的底色带进文件（2026.11.03 修复；当天二次返工，最终结论）**：暗色外观下（plist `useDarkTheme=1` + `darkTheme=Moon`）导出、即使 `export.pdf.exportTheme=sun`，纸面仍是 Moon 的 `#292929`，正文/链接却是 Sun 的 `#1d1d1f`/`#b58900` ⇒ **深底 + 深字**，内容区残留一块白。
+   - **证据 1（PDF 内容流）**：首页先 `0 0 595 842 re f` 填 `#292929`，再叠 `36 45.33 523 739 re f` 白块（#write），说明整页底色来自 html/body，内容块另有白底。
+   - **证据 2（推翻第一版修法）**：白块左右各留 36pt ⇒ `body.typora-export{padding:30px}` 仍是 30px；而 Typora 自己注入的 `@media print { body.typora-export{padding:0} }` 会清零。**说明导出管线根本不应用 `@media print`**（WKWebView 快照按 screen 渲染），所以第一版「把规则塞进 `@media print` 并抬特异性」注定无效——这是返工的真因，不是选择器不够狠。
+   - ⇒ 固化修法：在 `:root` 之后**无条件**锁底（不依赖媒体类型）：
+     `html, html:root { background-color: var(--print-bg) !important }`
+     `body, body.typora-export, body.typora-export .typora-export-content, body.typora-export #write { background-color: var(--print-bg) !important }`
+     三主题 `--print-bg` = 各自编辑态底色（Moon `#292929` / Sun `#ffffff` / Claude `#faf9f5`），编辑观感零变化。文件末尾的 `@media print` 块保留，但它只对真·浏览器打印有效，**不再作为导出兜底依据**。
+   - 验证法（可复现）：Typora 每次导出都会把中间 HTML 写到 `$TMPDIR/<随机数>.html`（含真实 `file://` link），取它 → 把 link 指向当前 CSS → 注入敌意样式 `html{background-color:#292929!important}` → Tabbit 无头 `--print-to-pdf` → 统计内容流填充色应为 `--print-bg`；**再把主题 CSS 里行首的 `@media print` 块全部剥掉重跑**，仍应为 `--print-bg`——这一步才是「不依赖媒体类型」的真正证据。
+   - Moon 刻意保持暗底纸面（主题身份）；要白纸导出就走 Sun / Claude。
 
 ## 设计基线（勿随意偏离）
 
